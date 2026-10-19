@@ -2,63 +2,352 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Monday Shift Mini Contribution</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <meta name="theme-color" content="#10251f">
+  <meta name="description" content="Access the Monday Shift Mini Contribution monthly records in one convenient place.">
+  <title>Monday Shift Mini Contribution</title>
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, Arial, sans-serif;
-      background: #eef1f4;
+    :root {
+      color-scheme: light;
+      --ink: #172923;
+      --muted: #65766f;
+      --green: #176b4a;
+      --green-dark: #10251f;
+      --mint: #e5f4ec;
+      --paper: #ffffff;
+      --canvas: #f3f6f3;
+      --line: #e0e8e2;
+      --shadow: 0 16px 40px rgba(23, 41, 35, .08);
     }
 
-    header {
-      background: #0b5ed7;
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at top left, rgba(204, 233, 216, .55), transparent 38rem),
+        var(--canvas);
+      line-height: 1.5;
+    }
+
+    .site-header {
+      background: var(--green-dark);
       color: #fff;
-      padding: 14px;
-      text-align: center;
-      font-size: 18px;
+      padding: 22px 20px;
+    }
+
+    .header-inner, main, .footer-inner {
+      width: min(1120px, 100%);
+      margin-inline: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      flex: 0 0 46px;
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      color: var(--green-dark);
+      background: #c8f0d9;
+    }
+
+    .brand-mark svg { width: 25px; height: 25px; }
+
+    .brand-name {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+      font-weight: 750;
+      letter-spacing: -.025em;
+    }
+
+    .brand-caption {
+      margin: 2px 0 0;
+      color: #c1d4ca;
+      font-size: .86rem;
+    }
+
+    main { padding: 34px 20px 42px; }
+
+    .intro {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .105em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2f9b68;
+      box-shadow: 0 0 0 4px rgba(47, 155, 104, .12);
+    }
+
+    h1 {
+      max-width: 700px;
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      line-height: 1.12;
+      letter-spacing: -.045em;
+    }
+
+    .intro-copy {
+      max-width: 620px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .record-label {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border: 1px solid #d6e8dc;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      color: #285b43;
+      font-size: .82rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .record-label svg { width: 17px; height: 17px; }
+
+    .sheet-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .sheet-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sheet-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .sheet-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 40px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--mint);
+      color: var(--green);
+    }
+
+    .sheet-icon svg { width: 21px; height: 21px; }
+
+    .sheet-heading h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 750;
+    }
+
+    .sheet-heading p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .swipe-hint {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #53665c;
+      font-size: .82rem;
       font-weight: 600;
     }
 
-    .hint {
+    .swipe-hint svg { flex: 0 0 auto; width: 18px; height: 18px; }
+
+    .sheet-frame {
+      width: 100%;
+      height: min(78vh, 900px);
+      min-height: 620px;
+      background: #fff;
+    }
+
+    .sheet-frame iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+
+    .helper {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 16px 18px;
+      border: 1px solid #dce9df;
+      border-radius: 14px;
+      background: rgba(255,255,255,.7);
+    }
+
+    .helper svg {
+      flex: 0 0 auto;
+      width: 20px;
+      height: 20px;
+      margin-top: 1px;
+      color: var(--green);
+    }
+
+    .helper p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .helper strong { color: var(--ink); }
+
+    footer {
+      padding: 0 20px 24px;
+      color: #748179;
+      font-size: .8rem;
       text-align: center;
-      font-size: 13px;
-      color: #555;
-      padding: 6px;
-      background: #fff;
     }
 
-    .sheet-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
+    @media (max-width: 680px) {
+      .site-header { padding: 17px 16px; }
+      .brand-mark { width: 42px; height: 42px; flex-basis: 42px; border-radius: 13px; }
+      main { padding: 27px 13px 30px; }
+      .intro { display: block; margin-bottom: 18px; }
+      h1 { font-size: clamp(1.75rem, 8vw, 2.35rem); }
+      .intro-copy { font-size: .94rem; }
+      .record-label { margin-top: 16px; }
+      .sheet-card { border-radius: 15px; }
+      .sheet-top { align-items: flex-start; padding: 15px 14px; }
+      .sheet-heading { gap: 9px; }
+      .sheet-icon { width: 36px; height: 36px; flex-basis: 36px; }
+      .sheet-heading h2 { font-size: .92rem; }
+      .sheet-heading p { font-size: .76rem; }
+      .swipe-hint { max-width: 112px; font-size: .74rem; line-height: 1.35; }
+      .sheet-frame { height: 72vh; min-height: 520px; }
+      .helper { padding: 14px; }
     }
 
-    iframe {
-      width: 1200px; /* prevents mobile compression */
-      height: 85vh;
-      border: none;
-    }
-
-    @media (min-width: 900px) {
-      iframe {
-        width: 100%;
+    @media (prefers-reduced-motion: no-preference) {
+      .sheet-card { animation: rise-in .45s ease-out both; }
+      @keyframes rise-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
       }
     }
   </style>
 </head>
 <body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect>
+            <path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17M8 13h3M8 16h6"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="brand-name">Monday Shift</p>
+          <p class="brand-caption">Mini Contribution Records</p>
+        </div>
+      </div>
+    </div>
+  </header>
 
-<header>Monday Shift Mini Contribution</header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Monthly records</p>
+        <h1 id="page-title">Your contributions, organized.</h1>
+        <p class="intro-copy">Access the Monday Shift Mini Contribution records in one convenient place. Browse the monthly tabs to find the information you need.</p>
+      </div>
+      <div class="record-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 3.5h7l4.5 4.5v12A1.5 1.5 0 0 1 17 21.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z"></path>
+          <path d="M14 3.5V8h4.5M8.5 12h7M8.5 15.5h7"></path>
+        </svg>
+        Contribution overview
+      </div>
+    </section>
 
-<div class="hint">Swipe left/right to view all months</div>
+    <section class="sheet-card" aria-labelledby="records-heading">
+      <div class="sheet-top">
+        <div class="sheet-heading">
+          <div class="sheet-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3.5" y="3.5" width="17" height="17" rx="2"></rect>
+              <path d="M3.5 9h17M9 9v11.5M14.5 9v11.5M3.5 14.5h17"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 id="records-heading">Monthly contribution sheet</h2>
+            <p>Published records · Google Sheets</p>
+          </div>
+        </div>
+        <div class="swipe-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8 5 3 10l5 5M16 5l5 5-5 5M3 10h18"></path>
+          </svg>
+          Swipe to browse months
+        </div>
+      </div>
 
-<div class="sheet-wrapper">
-  <iframe
-    src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTepn8qBwGVWr2Pt0MycAmR0TW9E3CdsvbSehA3xvaHYBXrfSDWeuOULeVA8bDwdw/pubhtml?widget=true&amp;headers=false">
-  </iframe>
-</div>
+      <div class="sheet-frame">
+        <iframe
+          title="Monday Shift Mini Contribution monthly records"
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTepn8qBwGVWr2Pt0MycAmR0TW9E3CdsvbSehA3xvaHYBXrfSDWeuOULeVA8bDwdw/pubhtml?widget=true&amp;headers=false"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>
+      </div>
+    </section>
 
+    <aside class="helper">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 11v5M12 7.5h.01"></path>
+      </svg>
+      <p><strong>Quick tip:</strong> On your phone, swipe horizontally within the records area to explore the monthly tabs. The contribution sheet remains the original published document.</p>
+    </aside>
+  </main>
+
+  <footer>
+    Monday Shift Mini Contribution · Monthly records
+  </footer>
 </body>
 </html>
