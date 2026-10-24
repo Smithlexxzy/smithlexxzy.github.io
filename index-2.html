@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Access the Monday Shift Mini Contribution monthly records in one convenient place.">
+<meta name="theme-color" content="#0c2a1c">
+<title>Monday Shift Mini Contribution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0c2a1c; --navy-2:#15402b; --sky:#e2efe7; --page:#eef5f0;
+    --ink:#12261b; --muted:#5a6e62; --accent:#2c7a4b; --accent-2:#2c7a4b;
+    --white:#fff; --line:#d5e3da;
+    --font:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);background:var(--page);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:3px solid var(--accent-2);outline-offset:3px;border-radius:6px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  header.top{background:linear-gradient(180deg,var(--navy) 0%,var(--navy-2) 100%);color:var(--white)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:84px}
+  .brand{display:flex;align-items:center;gap:14px;font-weight:800;font-size:1.5rem;letter-spacing:-.01em;text-decoration:none;color:inherit}
+  .logo{width:54px;height:54px;display:grid;place-items:center;font-weight:800;color:#fff}
+  .logo img{width:100%;height:100%;object-fit:cover;border-radius:50%;background:#fff;box-shadow:0 0 0 3px #ffffff30}
+  .logo span{width:100%;height:100%;border-radius:12px;background:var(--accent);display:grid;place-items:center}
+  .bar a.link{font-size:.9rem;font-weight:700;color:var(--sky);text-decoration:none;padding:8px 14px;border:1px solid #ffffff33;border-radius:999px}
+  .bar a.link:hover{background:#ffffff14}
+
+  .hero{padding:44px 0 110px}
+  h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.08;font-weight:800;letter-spacing:-.02em;max-width:16ch}
+  .hero p{margin-top:18px;max-width:52ch;color:#c6dccf;font-size:1.05rem}
+  .actions{margin-top:28px;display:flex;flex-wrap:wrap;gap:12px}
+  .btn{display:inline-block;padding:13px 22px;border-radius:12px;font-weight:700;text-decoration:none;font-size:.95rem}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{background:#38925f}
+  .btn.ghost{border:1px solid #ffffff44;color:#fff}
+  .btn.ghost:hover{background:#ffffff14}
+
+  main{margin-top:-70px;padding-bottom:56px}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 40px -24px rgba(12,42,28,.5);overflow:hidden}
+  .stats{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line)}
+  .stat{background:var(--white);padding:22px 24px}
+  .stat small{display:block;color:var(--muted);font-size:.85rem;font-weight:500}
+  .stat b{display:block;margin-top:4px;font-size:1.9rem;font-weight:800;letter-spacing:-.01em}
+  .stat.total b{font-size:2.4rem;color:var(--accent)}
+
+  section.block{margin-top:24px}
+  .head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .head h2{font-size:1.1rem;font-weight:800}
+  .head span{font-size:.85rem;color:var(--muted)}
+
+  .rows{padding:8px 20px 16px}
+  .row{display:grid;grid-template-columns:140px 1fr 110px;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .m{font-weight:700;font-size:.95rem}
+  .track{height:10px;border-radius:99px;background:var(--sky);overflow:hidden}
+  .fill{height:100%;border-radius:99px;background:var(--accent)}
+  .row .amt{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+  .empty{padding:20px;color:var(--muted);font-size:.92rem}
+
+  .frame{position:relative;height:72vh;min-height:420px;background:#fff}
+  .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .live{display:inline-flex;align-items:center;gap:8px}
+  .live::before{content:"";width:8px;height:8px;border-radius:50%;background:#2fa66b}
+  .tip{margin-top:20px;padding:16px 20px;border-radius:14px;background:var(--sky);color:var(--navy-2);font-size:.92rem}
+
+  footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--muted);font-size:.85rem}
+  footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+
+  @media (max-width:640px){
+    .hero{padding:30px 0 96px}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat.total{grid-column:1 / -1}
+    .row{grid-template-columns:104px 1fr 84px;gap:10px}
+    .frame{height:68vh}
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--page:#08140e;--white:#0f2218;--ink:#e6f0ea;--muted:#96ad9f;--line:#244034;--sky:#17382a}
+    .tip{color:#c6dccf}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <a class="brand" href="#"><span class="logo"><img src="logo.jpg" alt="Nigeria Immigration Service logo" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'M'}))"></span>Monday Shift</a>
+      <a class="link" href="#records">View records</a>
+    </div>
+    <section class="hero">
+      <h1>Monday Shift Contribution</h1>
+      <p>Browse the Monday Shift Mini Contribution records by month. See the total contributed so far, then open any month in the full sheet.</p>
+      <div class="actions">
+        <a class="btn primary" href="#records">Browse monthly records</a>
+        <a class="btn ghost" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTepn8qBwGVWr2Pt0MycAmR0TW9E3CdsvbSehA3xvaHYBXrfSDWeuOULeVA8bDwdw/pubhtml" target="_blank" rel="noopener">Open full sheet</a>
+      </div>
+    </section>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="card stats" aria-label="Contribution summary">
+      <div class="stat total"><small>Total contributed so far</small><b id="total">0</b></div>
+      <div class="stat"><small>Months recorded</small><b id="count">0</b></div>
+      <div class="stat"><small>Average per month</small><b id="avg">0</b></div>
+    </div>
+
+    <section class="card block" aria-labelledby="bk-title">
+      <div class="head"><h2 id="bk-title">Monthly breakdown</h2><span id="bk-note">Amount contributed each month</span></div>
+      <div class="rows" id="rows"></div>
+    </section>
+
+    <section class="card block" aria-labelledby="mb-title">
+      <div class="head"><h2 id="mb-title">Contributions by member</h2><span id="mb-note"></span></div>
+      <div class="rows" id="members"></div>
+    </section>
+
+    <section class="card block" id="records" aria-labelledby="sheet-title">
+      <div class="head"><h2 id="sheet-title">Monthly contribution sheet</h2><span class="live">Published records</span></div>
+      <div class="frame">
+        <iframe title="Monday Shift Mini Contribution monthly records" loading="lazy"
+          src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTepn8qBwGVWr2Pt0MycAmR0TW9E3CdsvbSehA3xvaHYBXrfSDWeuOULeVA8bDwdw/pubhtml?widget=true&amp;headers=false"></iframe>
+      </div>
+    </section>
+    <p class="tip"><strong>Tip:</strong> On your phone, swipe sideways inside the sheet to switch between months. The sheet is the original published record.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap"><span>Monday Shift Mini Contribution</span><span>Monthly records</span></div>
+</footer>
+
+<script>
+/* ---- EDIT THIS SECTION ----
+   Set your currency symbol and type in each month's total from the sheet.
+   The total, average, and bars update automatically. */
+var CURRENCY = "\u20A6";
+var MONTHS = [
+  { month: "January",   amount: 35000 },
+  { month: "February",  amount: 32000 },
+  { month: "March",     amount: 32500 },
+  { month: "April",     amount: 26500 },
+  { month: "May",       amount: 26000 },
+  { month: "June",      amount: 26000 },
+  { month: "July",      amount: 26000 },
+  { month: "August",    amount: 26000 },
+  { month: "September", amount: 21500 },
+  { month: "October",   amount: 7500 },
+  { month: "November",  amount: 5000 },
+  { month: "December",  amount: 10000 }
+];
+var MEMBERS = [
+  { name: "Abah O.J",          amount: 58500 },
+  { name: "Zacheriah E",       amount: 42000 },
+  { name: "C.E Akhilomen",     amount: 40500 },
+  { name: "Abdulsalam N.O",    amount: 40500 },
+  { name: "Musa Dinatu",       amount: 36000 },
+  { name: "Kingsley N.C",      amount: 25000 },
+  { name: "Olaiya R.O",        amount: 11000 },
+  { name: "Durojaye K.D",      amount: 10000 },
+  { name: "R Bako",            amount: 7500 },
+  { name: "Elisha Blessing",   amount: 2500 },
+  { name: "Yusuf Mairo .B",    amount: 500 }
+];
+/* ---- END EDIT SECTION ---- */
+
+(function () {
+  var fmt = function (n) { return CURRENCY + Number(n).toLocaleString(); };
+  var recorded = MONTHS.filter(function (m) { return m.amount > 0; });
+  var total = MONTHS.reduce(function (s, m) { return s + m.amount; }, 0);
+  var max = Math.max.apply(null, MONTHS.map(function (m) { return m.amount; }).concat([1]));
+
+  document.getElementById("total").textContent = fmt(total);
+  document.getElementById("count").textContent = recorded.length;
+  document.getElementById("avg").textContent = fmt(recorded.length ? Math.round(total / recorded.length) : 0);
+
+  function render(id, list, key) {
+    var box = document.getElementById(id);
+    var items = list.filter(function (x) { return x.amount > 0; });
+    var top = Math.max.apply(null, items.map(function (x) { return x.amount; }).concat([1]));
+    items.forEach(function (x) {
+      var r = document.createElement("div");
+      r.className = "row";
+      r.innerHTML = '<span class="m"></span><div class="track"><div class="fill"></div></div><span class="amt"></span>';
+      r.querySelector(".m").textContent = x[key];
+      r.querySelector(".fill").style.width = Math.max(3, (x.amount / top) * 100) + "%";
+      r.querySelector(".amt").textContent = fmt(x.amount);
+      box.appendChild(r);
+    });
+    if (!items.length) box.innerHTML = '<p class="empty">No amounts entered yet.</p>';
+  }
+  render("rows", MONTHS, "month");
+  render("members", MEMBERS, "name");
+  document.getElementById("mb-note").textContent = MEMBERS.filter(function (m) { return m.amount > 0; }).length + " members have contributed";
+})();
+</script>
+</body>
+</html>
