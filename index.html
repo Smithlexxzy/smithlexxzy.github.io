@@ -97,7 +97,7 @@
       <p>Browse the Monday Shift Mini Contribution records by month. See the total contributed so far, then all months are displayed in the full sheet below.</p>
       <div class="actions">
         <a class="btn primary" href="#records">Browse monthly records</a>
-        <a class="btn ghost" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQJLVedzoRUGXD2-iT-QcMbEL2V6UC6UtIxJfzxDMClwVpMNR9R8gjf6AS1gSvABzEUTp55mnQtomG0/pub?output=csv" target="_blank" rel="noopener">Open full sheet</a>
+        <a class="btn ghost" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTepn8qBwGVWr2Pt0MycAmR0TW9E3CdsvbSehA3xvaHYBXrfSDWeuOULeVA8bDwdw/pubhtml" target="_blank" rel="noopener">Open full sheet</a>
       </div>
     </section>
   </div>
@@ -137,68 +137,99 @@
 </footer>
 
 <script>
-/* ---- EDIT THIS SECTION ----
-   Set your currency symbol and type in each month's total from the sheet.
-   The total, average, and bars update automatically. */
+/* ---- SETTINGS ---- */
 var CURRENCY = "\u20A6";
+/* Published CSV of the sheet (File > Share > Publish to web > CSV). Add &gid=XXXX if the data is not on the first tab. */
+var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTepn8qBwGVWr2Pt0MycAmR0TW9E3CdsvbSehA3xvaHYBXrfSDWeuOULeVA8bDwdw/pub?output=csv";
+
+/* Fallback shown only if the sheet cannot be reached (matches the sheet as of 27 Oct 2026) */
 var MONTHS = [
-  { month: "January",   amount: 35000 },
-  { month: "February",  amount: 32000 },
-  { month: "March",     amount: 32500 },
-  { month: "April",     amount: 26500 },
-  { month: "May",       amount: 26000 },
-  { month: "June",      amount: 26000 },
-  { month: "July",      amount: 26000 },
-  { month: "August",    amount: 26000 },
-  { month: "September", amount: 21500 },
-  { month: "October",   amount: 7500 },
-  { month: "November",  amount: 5000 },
-  { month: "December",  amount: 10000 }
+  {month:"January",amount:35000},{month:"February",amount:32000},{month:"March",amount:37500},
+  {month:"April",amount:31500},{month:"May",amount:26000},{month:"June",amount:26000},
+  {month:"July",amount:26000},{month:"August",amount:26000},{month:"September",amount:21500},
+  {month:"October",amount:12000},{month:"November",amount:5000},{month:"December",amount:10000}
 ];
 var MEMBERS = [
-  { name: "Abah O.J",          amount: 58500 },
-  { name: "Zacheriah E",       amount: 42000 },
-  { name: "C.E Akhilomen",     amount: 40500 },
-  { name: "Abdulsalam N.O",    amount: 40500 },
-  { name: "Musa Dinatu",       amount: 36000 },
-  { name: "Kingsley N.C",      amount: 25000 },
-  { name: "Olaiya R.O",        amount: 11000 },
-  { name: "Durojaye K.D",      amount: 10000 },
-  { name: "R Bako",            amount: 7500 },
-  { name: "Elisha Blessing",   amount: 2500 },
-  { name: "Yusuf Mairo .B",    amount: 500 }
+  {name:"Abah O.J",amount:58500},{name:"C.E Akhilomen",amount:45000},{name:"Zacheriah E",amount:42000},
+  {name:"Abdulsalam N.O",amount:40500},{name:"Musa Dinatu",amount:36000},{name:"Kingsley N.C",amount:25000},
+  {name:"Olaiya R.O",amount:21000},{name:"Durojaye K.D",amount:10000},{name:"R Bako",amount:7500},
+  {name:"Elisha Blessing",amount:2500},{name:"Yusuf Mairo .B",amount:500}
 ];
-/* ---- END EDIT SECTION ---- */
+/* ---- END SETTINGS ---- */
 
-(function () {
-  var fmt = function (n) { return CURRENCY + Number(n).toLocaleString(); };
-  var recorded = MONTHS.filter(function (m) { return m.amount > 0; });
-  var total = MONTHS.reduce(function (s, m) { return s + m.amount; }, 0);
-  var max = Math.max.apply(null, MONTHS.map(function (m) { return m.amount; }).concat([1]));
+var MONTH_KEYS = {JAN:"January",FEB:"February",MAR:"March",APR:"April",APRIL:"April",MAY:"May",JUN:"June",JUNE:"June",
+  JUL:"July",JULY:"July",AUG:"August",SEP:"September",SEPT:"September",OCT:"October",NOV:"November",DEC:"December"};
 
-  document.getElementById("total").textContent = fmt(total);
-  document.getElementById("count").textContent = recorded.length;
-  document.getElementById("avg").textContent = fmt(recorded.length ? Math.round(total / recorded.length) : 0);
+function parseCSV(t){
+  var rows=[],row=[],cur="",q=false,i,c;
+  for(i=0;i<t.length;i++){
+    c=t[i];
+    if(q){ if(c=='"'){ if(t[i+1]=='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if(c=='"') q=true;
+    else if(c==","){ row.push(cur); cur=""; }
+    else if(c=="\n"||c=="\r"){ if(c=="\r"&&t[i+1]=="\n") i++; row.push(cur); rows.push(row); row=[]; cur=""; }
+    else cur+=c;
+  }
+  if(cur!==""||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function num(v){ var n=parseFloat(String(v||"").replace(/[^0-9.\-]/g,"")); return isNaN(n)?0:n; }
+function tidy(name){
+  return name.trim().split(/\s+/).map(function(w){
+    return (w.length<=3||(w.indexOf(".")>-1&&w.length<=4)) ? w.toUpperCase() : w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();
+  }).join(" ");
+}
+function fromSheet(rows){
+  var h=-1,r,j;
+  for(r=0;r<rows.length;r++){ if(rows[r].some(function(x){return /^names?$/i.test(x.trim());})){h=r;break;} }
+  if(h<0) throw new Error("header row not found");
+  var head=rows[h].map(function(x){return x.trim().toUpperCase();});
+  var nameCol=head.findIndex(function(x){return /^NAMES?$/.test(x);});
+  var cols=[];
+  head.forEach(function(x,idx){ if(MONTH_KEYS[x]) cols.push({idx:idx,month:MONTH_KEYS[x]}); });
+  if(!cols.length) throw new Error("month columns not found");
+  var months=cols.map(function(c){return {month:c.month,amount:0};}), members=[];
+  for(r=h+1;r<rows.length;r++){
+    var nm=(rows[r][nameCol]||"").trim(); if(!nm) continue;
+    var tot=0;
+    cols.forEach(function(c,k){ var v=num(rows[r][c.idx]); months[k].amount+=v; tot+=v; });
+    members.push({name:tidy(nm),amount:tot});
+  }
+  members.sort(function(a,b){return b.amount-a.amount;});
+  return {months:months,members:members};
+}
 
-  function render(id, list, key) {
-    var box = document.getElementById(id);
-    var items = list.filter(function (x) { return x.amount > 0; });
-    var top = Math.max.apply(null, items.map(function (x) { return x.amount; }).concat([1]));
-    items.forEach(function (x) {
-      var r = document.createElement("div");
-      r.className = "row";
-      r.innerHTML = '<span class="m"></span><div class="track"><div class="fill"></div></div><span class="amt"></span>';
-      r.querySelector(".m").textContent = x[key];
-      r.querySelector(".fill").style.width = Math.max(3, (x.amount / top) * 100) + "%";
-      r.querySelector(".amt").textContent = fmt(x.amount);
+function draw(){
+  var fmt=function(n){return CURRENCY+Number(n).toLocaleString();};
+  var recorded=MONTHS.filter(function(m){return m.amount>0;});
+  var total=MONTHS.reduce(function(s,m){return s+m.amount;},0);
+  document.getElementById("total").textContent=fmt(total);
+  document.getElementById("count").textContent=recorded.length;
+  document.getElementById("avg").textContent=fmt(recorded.length?Math.round(total/recorded.length):0);
+  function render(id,list,key){
+    var box=document.getElementById(id); box.innerHTML="";
+    var items=list.filter(function(x){return x.amount>0;});
+    var top=Math.max.apply(null,items.map(function(x){return x.amount;}).concat([1]));
+    items.forEach(function(x){
+      var r=document.createElement("div"); r.className="row";
+      r.innerHTML='<span class="m"></span><div class="track"><div class="fill"></div></div><span class="amt"></span>';
+      r.querySelector(".m").textContent=x[key];
+      r.querySelector(".fill").style.width=Math.max(3,(x.amount/top)*100)+"%";
+      r.querySelector(".amt").textContent=fmt(x.amount);
       box.appendChild(r);
     });
-    if (!items.length) box.innerHTML = '<p class="empty">No amounts entered yet.</p>';
+    if(!items.length) box.innerHTML='<p class="empty">No amounts entered yet.</p>';
   }
-  render("rows", MONTHS, "month");
-  render("members", MEMBERS, "name");
-  document.getElementById("mb-note").textContent = MEMBERS.filter(function (m) { return m.amount > 0; }).length + " members have contributed";
-})();
+  render("rows",MONTHS,"month");
+  render("members",MEMBERS,"name");
+  document.getElementById("mb-note").textContent=MEMBERS.filter(function(m){return m.amount>0;}).length+" members have contributed";
+}
+
+draw(); /* show fallback instantly, then sync */
+fetch(CSV_URL+(CSV_URL.indexOf("?")>-1?"&":"?")+"t="+Date.now(),{cache:"no-store"})
+  .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
+  .then(function(t){ var d=fromSheet(parseCSV(t)); MONTHS=d.months; MEMBERS=d.members; draw(); })
+  .catch(function(e){ console.warn("Sheet sync failed, showing saved figures:",e); });
 </script>
 </body>
 </html>
